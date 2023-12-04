@@ -1,0 +1,56 @@
+---
+trainer_config:
+  update_timesteps: 1
+  num_examples: 2
+  actor_lr: 0.01 #0.00001
+  critic_lr: 0.00001
+  num_episodes: 10
+  max_timesteps: 10
+  examples_path: "./data/경상도_rlhf/test.0" # "dataset/sections_dataset.json" ### Unparalled 데이터셋?
+  batch_size: 1
+  epochs: 5
+  actor_eps_clip: 0.2
+  critic_eps_clip: 0.2
+  beta_s: 0.9 #0.1
+  update_checkpoint: 10
+  llm_model_id: "text-davinci-003"
+  llm_max_tokens: 1024
+  llm_temperature: 0.5
+  checkpoint_folder: "rlhf/rl_output/checkpoints" #"./rl_output/checkpoints" #"./models/checkpoints"
+  lr: 2e-7 ### reward_pretrain_lr
+
+actor_config:
+  model: "hyunwoongko/kobart" #"llama-7B"
+  max_tokens: 128 #1024
+  temperature: 1.0 # BART 모델 .generate() 시 temperature 인자값 (default=1.0)
+  train_dataset_path: "./data/경상도_new/train.0" #"dataset/sections_dataset.json"
+  validation_dataset_path: null
+  batch_size: 16
+  iteration_per_print: 10
+  lr: 2e-7 # subtask 1(경상도 -> 표준어): 2e-7 # subtask 2(합쇼체 -> 반말체): 3e-5
+  epochs: 20 # subtask 1(경상도 -> 표준어): 20 # subtask 2(합쇼체 -> 반말체): 10
+  subtask_name: 'Saturi' # or 'Formality'
+  model_folder: "/data/hyunkyung_lee/style_transfer/saturi/outputs/total_bart_seq2seq_0831_CE+SC+BL_배치문장다_mean_2번에이어서_patience3_20" #"path-to-checkpoints"
+  tokenizer_folder: ""
+
+reward_config:
+  # model to be chosen are gp2-large, bart-base, longformer-base-4096
+  model: "klue/bert-base"
+  ###model_head_hidden_size: 2048
+  subtask_name: 'Saturi' # or 'Formality'
+  model_folder: "/data/hyunkyung_lee/style_transfer/saturi/outputs/total_style_classifier_0821_20epoch/"
+  max_tokens: 128 # 추가
+  train_dataset_path: "data/경상도/total/" # "/home/pierpaolo/Documents/optimapi/dataset/sections_dataset.json"
+  validation_dataset_path: null
+  batch_size: 64
+  epochs: 5 # subtask 1(경상도 -> 표준어): 5?? # subtask 2(합쇼체 -> 반말체): 5
+  iteration_per_print: 10
+  lr: 2e-7 # subtask 1(경상도 -> 표준어): 2e-7 # subtask 2(합쇼체 -> 반말체): 2e-7
+
+critic_config:
+  # model to be chosen are gp2-large, bart-base, longformer-base-4096
+  model: "klue/bert-base"
+  ###model_head_hidden_size: 2048
+  subtask_name: 'Saturi' # or 'Formality'
+  model_folder: "/data/hyunkyung_lee/style_transfer/saturi/outputs/total_style_classifier_0821_20epoch/" # "./models"
+  max_tokens: 128 # 추가
